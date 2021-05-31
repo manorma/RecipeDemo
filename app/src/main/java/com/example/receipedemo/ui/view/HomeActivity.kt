@@ -19,9 +19,7 @@ class HomeActivity :AppCompatActivity(){
             override fun onClick(v: View?) {
                 val intent = Intent(this@HomeActivity,SearchActivity::class.java)
                 startActivity(intent)
-
             }
-
         })
 
         btnObserveable.setOnClickListener(object: View.OnClickListener{
@@ -29,7 +27,6 @@ class HomeActivity :AppCompatActivity(){
                 val intent = Intent(this@HomeActivity,MainActivity::class.java)
                 startActivity(intent)
             }
-
         })
 
         btnRecipe.setOnClickListener(object :View.OnClickListener{
@@ -37,7 +34,6 @@ class HomeActivity :AppCompatActivity(){
                 val intent = Intent(this@HomeActivity,RecipeActivity::class.java)
                 startActivity(intent)
             }
-
         })
 
         btnStart.setOnClickListener(object :View.OnClickListener{
@@ -45,7 +41,6 @@ class HomeActivity :AppCompatActivity(){
                 val intent = Intent(this@HomeActivity,GameActivity::class.java)
                 startActivity(intent)
             }
-
         })
 
 

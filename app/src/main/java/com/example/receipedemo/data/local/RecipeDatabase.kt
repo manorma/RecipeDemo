@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.example.receipedemo.data.model.RecipeItem
+import com.example.receipedemo.data.model.RecipeResp
 import java.util.*
 
-@Database(entities = arrayOf(RecipeItem::class),version = 1)
+@Database(entities = arrayOf(RecipeResp.RecipeItem::class),version = 1)
 abstract class RecipeDatabase:RoomDatabase(){
     companion object{
         private var mInstance: RecipeDatabase? = null
@@ -22,9 +22,5 @@ abstract class RecipeDatabase:RoomDatabase(){
         }
     }
 
-
     abstract fun recipeDao():RecipeDao
-
-
-
 }

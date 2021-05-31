@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.view.MainActivity">
 
-    <androidx.appcompat.widget.SearchView
+    <androidx.appcompat.widget.AppCompatEditText
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintTop_toTopOf="parent"
@@ -15,7 +15,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:id="@+id/search_view">
 
-    </androidx.appcompat.widget.SearchView>
+    </androidx.appcompat.widget.AppCompatEditText>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"

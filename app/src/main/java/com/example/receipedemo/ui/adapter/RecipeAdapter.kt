@@ -8,14 +8,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.receipedemo.R
-import com.example.receipedemo.data.model.Recipe
-import com.example.receipedemo.data.model.RecipeItem
+import com.example.receipedemo.data.model.RecipeResp
 import kotlinx.android.synthetic.main.recipe_item.view.*
 
 class RecipeAdapter : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
-    private var recipeList = ArrayList<RecipeItem>()
-    lateinit var recipeLisener:OnRecipelickListener
-    lateinit var mContext:Context
+    private var recipeList = ArrayList<RecipeResp.RecipeItem>()
+    private lateinit var recipeListener: OnRecipelickListener
+    lateinit var mContext: Context
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecipeViewHolder {
         mContext = parent.context
@@ -33,17 +32,16 @@ class RecipeAdapter : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: RecipeViewHolder, position: Int) {
-        Log.d("RecipeAdapter","onBind"+position)
-        holder.bind(recipeList.get(position))
+        Log.d("RecipeAdapter", "onBind$position")
+        holder.bind(recipeList[position])
     }
 
-    fun setLisener(lisener: OnRecipelickListener) {
-        this.recipeLisener = lisener
-
+    fun setListener(listener: OnRecipelickListener) {
+        this.recipeListener = listener
     }
 
-    fun setRecipe(result:ArrayList<RecipeItem>){
-        Log.d("RecipeAdapter","setRecipe")
+    fun setRecipe(result: ArrayList<RecipeResp.RecipeItem>) {
+        Log.d("RecipeAdapter", "setRecipe")
         recipeList.clear()
         recipeList.addAll(result)
         notifyDataSetChanged()
@@ -53,30 +51,19 @@ class RecipeAdapter : RecyclerView.Adapter<RecipeAdapter.RecipeViewHolder>() {
         fun onRecipeClick()
     }
 
-
     inner class RecipeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView.rootView) {
-
-        fun bind(recipe: RecipeItem) {
-            Log.d("RecipeAdapter","bind"+recipe)
+        fun bind(recipe: RecipeResp.RecipeItem) {
+            Log.d("RecipeAdapter", "bind$recipe")
             itemView.title.text = recipe.title
             itemView.publisher.text = recipe.publisher
-            itemView.rank.text = recipe.social_rank.toString()
+            itemView.rank.text = recipe.socialRank.toString()
             Glide.with(mContext)
-                .load(recipe.image_url)
+                .load(recipe.imageUrl)
                 .centerCrop()
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(itemView.imageView)
             itemView.imageView
-            itemView.setOnClickListener(object :View.OnClickListener{
-                override fun onClick(v: View?) {
-
-                }
-
-            })
-
+            itemView.setOnClickListener { recipeListener.onRecipeClick() }
         }
-
     }
-
-
 }

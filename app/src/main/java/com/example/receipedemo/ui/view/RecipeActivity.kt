@@ -3,120 +3,47 @@ package com.example.receipedemo.ui.view
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.receipedemo.R
 import com.example.receipedemo.ui.adapter.RecipeAdapter
 import com.example.receipedemo.ui.viewmodel.RecipeViewModel
 import com.example.receipedemo.ui.viewmodel.ViewModelFactory
-import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.ObservableOnSubscribe
-import io.reactivex.SingleObserver
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.disposables.Disposable
-import io.reactivex.observers.DisposableObserver
-import io.reactivex.schedulers.Schedulers
+import com.jakewharton.rxbinding4.widget.textChangeEvents
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_recipe.*
 import java.util.concurrent.TimeUnit
-import java.util.function.Consumer
 
-class RecipeActivity :AppCompatActivity(),RecipeAdapter.OnRecipelickListener{
-    override fun onRecipeClick() {
+class RecipeActivity : AppCompatActivity(), RecipeAdapter.OnRecipelickListener {
 
-    }
-
-    lateinit var viewModel:RecipeViewModel
-    lateinit var recipeAdapter:RecipeAdapter
-    val disposable = CompositeDisposable()
+    lateinit var viewModel: RecipeViewModel
+    lateinit var recipeAdapter: RecipeAdapter
+    private lateinit var disposable: io.reactivex.rxjava3.disposables.Disposable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_recipe)
         val factory = ViewModelFactory(this)
-        viewModel = ViewModelProviders.of(this,factory).get(RecipeViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, factory).get(RecipeViewModel::class.java)
         initRecyclerView()
-        subscribeToSearch(getSearchObservable())
+        setRxTextView()
         initSubscriber()
     }
 
-    private fun getSearchObservable() :Observable<String>{
-
-        return Observable.create(object :ObservableOnSubscribe<String>{
-            override fun subscribe(emitter: ObservableEmitter<String>) {
-                search_view.setOnQueryTextListener(object :SearchView.OnQueryTextListener{
-                    override fun onQueryTextSubmit(query: String?): Boolean {
-                        return false
-                    }
-
-                    override fun onQueryTextChange(newText: String?): Boolean {
-                        if(!emitter.isDisposed){
-                            newText?.let {
-                                emitter.onNext(newText!!)
-                            }
-                        }
-                        return false
-                    }
-
-                })
-            }
-
-        }).debounce(1000,TimeUnit.MILLISECONDS)
-            .subscribeOn(Schedulers.io())
-
-    }
-
-    private fun subscribeToSearch(observable: Observable<String>) {
-        disposable.add(observable.observeOn(AndroidSchedulers.mainThread()).subscribeOn(Schedulers.io()).subscribeWith(object :
-            DisposableObserver<String>() {
-            override fun onComplete() {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onNext(t: String) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-            override fun onError(e: Throwable) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-            }
-
-        }));
-
-
-
-
-
-        observable
+    private fun setRxTextView() {
+        disposable = search_view.textChangeEvents()
+            .skipInitialValue()
+            .map { it.text.toString() }
+            .debounce(800, TimeUnit.MILLISECONDS)
+            .filter { it.isNotEmpty() }
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe(object : io.reactivex.Observer<String> {
-                override fun onSubscribe(d: Disposable) {
-                    disposable.add(d)
-                }
-
-                override fun onNext(t: String) {
-                    Log.d(RecipeViewModel.TAG,"fetchRecipe :"+t)
-                    viewModel.fetchRecipe(t)
-                }
-
-                override fun onError(e: Throwable) {
-                    Log.d(RecipeViewModel.TAG,"onError :"+e.message)
-                }
-
-                override fun onComplete(){
-                    Log.d(RecipeViewModel.TAG,"onComplete :")
-                }
-
-            })
-
+            .subscribeOn(Schedulers.computation())
+            .subscribe { viewModel.fetchRecipe(it) }
     }
+
     private fun initSubscriber() {
-        viewModel.recipeList.observe(this, Observer {
-            Log.d("RecipeActivity","initSubscriber " )
+        viewModel.recipeList.observe(this, {
             recipeAdapter.setRecipe(it)
         })
     }
@@ -124,8 +51,11 @@ class RecipeActivity :AppCompatActivity(),RecipeAdapter.OnRecipelickListener{
     private fun initRecyclerView() {
         recycler_view.layoutManager = LinearLayoutManager(this)
         recipeAdapter = RecipeAdapter()
-        recipeAdapter.setLisener(this)
+        recipeAdapter.setListener(this)
         recycler_view.adapter = recipeAdapter
     }
 
+    override fun onRecipeClick() {
+
+    }
 }
